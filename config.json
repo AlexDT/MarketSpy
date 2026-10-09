@@ -1,0 +1,30 @@
+{
+  "search_query": "meta quest 3",
+  "target_place": "Vlaardingen",
+  "places_within_reach": [
+    "Vlaardingen",
+    "Schiedam",
+    "Rotterdam",
+    "Delft",
+    "Maassluis",
+    "Hoek van Holland",
+    "Den Haag",
+    "Rijswijk",
+    "Voorburg",
+    "Rijnsburg",
+    "Voorschoten",
+    "Leiden",
+    "Katwijk",
+    "Capelle aan den IJssel",
+    "Spijkenisse",
+    "Hoogvliet",
+    "Barendrecht",
+    "'s-Gravenhage",
+    "Wateringen"
+  ],
+  "storage_required_gb": [512],
+  "storage_optional_gb": [128],
+  "photo_download": true,
+  "max_price_eur": 800,
+  "min_price_eur": 150
+}
