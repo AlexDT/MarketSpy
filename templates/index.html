@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>MarketSpy</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 900px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.1rem; margin-top: 2rem; }
+  form section { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+  label { display: block; font-size: .85rem; margin-top: .6rem; }
+  input[type=text], input[type=number], input[type=submit] { padding: .4rem; }
+  .rij { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+  .kaart { border: 1px solid #ddd; border-radius: 8px; padding: .8rem 1rem; margin-bottom: .6rem; }
+  .kaart form { display: inline; }
+  button { padding: .3rem .7rem; cursor: pointer; }
+  .muted { color: #666; font-size: .8rem; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #ddd; padding: .3rem .5rem; font-size: .8rem; text-align: left; }
+  pre { background: #f6f6f6; padding: 1rem; border-radius: 8px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>MarketSpy</h1>
+<p class="muted"><a href="/inbox">Binnengekomen via Safari-extensie →</a></p>
+
+<h2>Nieuwe / wijzig zoekopdracht {% if bewerk %}(scherpen: {{ bewerk.naam }}){% endif %}</h2>
+<form method="post" action="/opslaan">
+  <section>
+    <div class="rij">
+      <div>
+        <label>Naam (voor jezelf)</label>
+        <input type="text" name="naam" placeholder="bv. Quest 3 512GB regio Vlaardingen" value="{{ bewerk.naam if bewerk else '' }}">
+      </div>
+      <div>
+        <label>Zoekterm</label>
+        <input type="text" name="zoekterm" value="{{ bewerk.zoekterm if bewerk else 'meta quest 3' }}">
+      </div>
+    </div>
+
+    <label>Opslag — voorkeur (wordt sowieso gezocht)</label>
+    <div class="rij">
+      <label><input type="checkbox" name="opslag_voorkeur" value="512" {% if not bewerk or 512 in bewerk.opslag_voorkeur %}checked{% endif %}> 512 GB</label>
+      <label><input type="checkbox" name="opslag_voorkeur" value="128" {% if bewerk and 128 in bewerk.opslag_voorkeur %}checked{% endif %}> 128 GB</label>
+    </div>
+
+    <label>Opslag — optioneel (mag, hoeft niet)</label>
+    <div class="rij">
+      <label><input type="checkbox" name="opslag_optioneel" value="128" {% if not bewerk or 128 in bewerk.opslag_optioneel %}checked{% endif %}> 128 GB</label>
+      <label><input type="checkbox" name="opslag_optioneel" value="512" {% if bewerk and 512 in bewerk.opslag_optioneel %}checked{% endif %}> 512 GB</label>
+    </div>
+
+    <label>Conditie</label>
+    <div class="rij">
+      <label><input type="checkbox" name="condities" value="nieuw" {% if not bewerk or 'nieuw' in bewerk.condities %}checked{% endif %}> Nieuw</label>
+      <label><input type="checkbox" name="condities" value="zo goed als nieuw" {% if not bewerk or 'zo goed als nieuw' in bewerk.condities %}checked{% endif %}> Zo goed als nieuw</label>
+      <label><input type="checkbox" name="condities" value="gebruikt" {% if bewerk and 'gebruikt' in bewerk.condities %}checked{% endif %}> Gebruikt (overwegen)</label>
+    </div>
+
+    <div class="rij">
+      <div>
+        <label>Minimumprijs (€)</label>
+        <input type="number" name="min_prijs" value="{{ bewerk.min_prijs if bewerk else 150 }}">
+      </div>
+      <div>
+        <label>Maximumprijs (€)</label>
+        <input type="number" name="max_prijs" value="{{ bewerk.max_prijs if bewerk else 800 }}">
+      </div>
+      <div>
+        <label>Min. aantal accessoires (0 = niet verplicht)</label>
+        <input type="number" name="min_accessoires" value="{{ bewerk.min_accessoires if bewerk else 0 }}">
+      </div>
+    </div>
+
+    <label>Plaatsen binnen bereik (kommagescheiden; leeg = heel NL/BE)</label>
+    <input type="text" name="plaatsen" size="70"
+           value="{{ bewerk.plaatsen|join(', ') if bewerk else 'Vlaardingen, Schiedam, Rotterdam, Delft, Maassluis, Den Haag, Rijnsburg, Voorschoten, Leiden, Wateringen' }}">
+
+    <div class="rij">
+      <label><input type="checkbox" name="alleen_vaste_prijs" {% if not bewerk or bewerk.alleen_vaste_prijs %}checked{% endif %}> Alleen vaste prijs (geen "bieden")</label>
+      <label><input type="checkbox" name="fotos_downloaden" {% if not bewerk or bewerk.fotos_downloaden %}checked{% endif %}> Foto's downloaden voor controle</label>
+    </div>
+
+    <input type="hidden" name="id" value="{{ bewerk.id if bewerk else '' }}">
+    <p><input type="submit" value="Query opslaan"></p>
+  </section>
+</form>
+
+<h2>Mijn zoekopdrachten</h2>
+{% for q in queries %}
+<div class="kaart">
+  <strong>{{ q.naam }}</strong>
+  <span class="muted">— "{{ q.zoekterm }}",
+    voorkeur {{ q.opslag_voorkeur }}{% if q.opslag_optioneel %} / optioneel {{ q.opslag_optioneel }}{% endif %},
+    condities {{ q.condities|join(', ') }},
+    €{{ q.min_prijs }}–{{ q.max_prijs }},
+    {{ q.plaatsen|length }} plaatsen,
+    vaste prijs: {{ 'ja' if q.alleen_vaste_prijs else 'nee' }},
+    accessoires ≥ {{ q.min_accessoires }},
+    foto's: {{ 'ja' if q.fotos_downloaden else 'nee' }}</span>
+  <div class="muted">laatst gescand: {{ q.laatst_gescand or 'nooit' }}</div>
+  <form method="post" action="/scan/{{ q.id }}"><button>Scan nu</button></form>
+  <a href="/?bewerk={{ q.id }}#top">Scherpen</a>
+  <form method="post" action="/verwijder/{{ q.id }}"
+        onsubmit="return confirm('Verwijderen?')"><button>Verwijderen</button></form>
+</div>
+{% else %}
+<p class="muted">Nog geen queries — maak er hierboven één aan.</p>
+{% endfor %}
+
+{% if report %}
+<h2>Laatste scan-rapport</h2>
+<pre>{{ report }}</pre>
+{% endif %}
+</body>
+</html>
