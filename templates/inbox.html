@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>MarketSpy — binnengekomen pagina's</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 950px; margin: 2rem auto; padding: 0 1rem; }
+  h1 { font-size: 1.3rem; }
+  p.muted { color: #666; font-size: .85rem; }
+  table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+  td, th { border: 1px solid #ddd; padding: .35rem .5rem; font-size: .8rem; text-align: left; vertical-align: top; }
+  th { background: #f4f4f4; }
+  a { color: #06c; }
+</style>
+</head>
+<body>
+<h1>Binnengekomen via de Safari-extensie</h1>
+<p class="muted">Dit zijn de pagina's die je met de extensie-knop hebt doorgestuurd. Elke pagina is als ruwe JSON opgeslagen in <code>data/inbox/</code> — volledige tekst, foto-URL's en verkoperinfo. Stuur het bestand of de inhoud door naar de agent voor analyse (foto-uniciteit, reviews, flags).</p>
+{% if items %}
+<table>
+<tr><th>Verzonden</th><th>Ad nr</th><th>Titel</th><th>Prijs</th><th>Conditie</th><th>Plaats</th><th>Verkoper</th><th>Reviews</th><th>Foto's</th><th>Link</th></tr>
+{% for it in items %}
+<tr>
+  <td>{{ it.verzonden }}</td>
+  <td>{{ it.ad_nummer or '—' }}</td>
+  <td>{{ (it.titel or '')[:60] }}</td>
+  <td>{{ it.prijs or '?' }}</td>
+  <td>{{ it.conditie or '?' }}</td>
+  <td>{{ it.plaats or '?' }}</td>
+  <td>{{ it.verkoper or '?' }}</td>
+  <td>{{ it.reviews or '?' }}</td>
+  <td>{{ it.fotos }}</td>
+  <td>{% if it.url %}<a href="{{ it.url }}">open</a>{% else %}—{% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<p>Nog niets binnengekomen. Open een advertentie op Marktplaats/2dehands en klik op de extensie-knop.</p>
+{% endif %}
+</body>
+</html>
