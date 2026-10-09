@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "MarketSpy Helper",
+  "version": "1.0",
+  "description": "Stuurt Marktplaats/2dehands advertentie- en profielpagina's door naar je lokale MarketSpy.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "https://www.marktplaats.nl/*",
+    "https://www.2dehands.be/*",
+    "https://www.funda.nl/*",
+    "http://127.0.0.1:5001/*"
+  ],
+  "action": {
+    "default_title": "Stuur pagina naar MarketSpy"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}
